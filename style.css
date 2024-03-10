@@ -126,7 +126,7 @@ nav #mainLogo img {
   display: flex;
   flex-direction: row;
   width: 100%;
-  height: 100vh;
+  height: 70vh;
 }
 
 #chapter {
@@ -136,16 +136,17 @@ nav #mainLogo img {
   overflow: scroll;
 }
 
-li {
+ul {
   list-style-type: none;
   font-size: 1rem;
 }
-ul {
+li {
   margin: 0rem 0.5rem 1rem;
   padding: 8px;
   border-radius: 10px;
+  cursor: pointer;
 }
-ul:hover {
+li:hover {
   background-color: var(--Primary);
 }
 #chapterLines {
