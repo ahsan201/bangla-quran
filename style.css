@@ -1,15 +1,15 @@
-@font-face {
+/* @font-face {
   font-family: "Indopak Fonts";
   src: url("Fonts\IndoPak Fonts\AlQuran-IndoPak-by-QuranWBW.v.4.2.2-WL.ttf");
-}
+} */
 @font-face {
   font-family: "Bangla Alinur";
   src: url("Fonts\AlinurTatsama\ANSI V2\Li Alinur Tatsama ANSI V2.ttf");
 }
-@font-face {
+/* @font-face {
   font-family: "Inter";
   src: url("Fonts\Inter\Inter-VariableFont_slnt,wght.ttf");
-}
+} */
 
 :root {
   /* fonts */
@@ -155,7 +155,7 @@ li:hover {
 
   overflow: scroll;
 }
-#chapterLines li ul {
+#chapterLines ul li {
   text-align: center;
 }
 
@@ -184,6 +184,7 @@ section {
   text-align: center;
   margin-top: 2rem;
   font-size: 2rem;
+  margin-bottom: 3rem;
 }
 
 #surahContent {
@@ -191,19 +192,30 @@ section {
   padding: 1rem 5rem 1rem;
   font-size: var(--FontSize-24);
 }
-.lineBox {
-  height: 70vh;
-  margin-top: 5rem;
-  overflow: scroll;
-}
+
 .surahBox {
   width: 100%;
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid var(--Primary);
-  padding: 2rem;
-  border-radius: 1rem;
+  padding: 3rem;
+
   gap: 4px;
+}
+.surahBox:hover {
+  background-color: var(--Primary);
+  border-radius: 1rem;
+}
+#content {
+  height: 100vh;
+  overflow: scroll;
+}
+#lineNumber {
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+#arabicText {
+  line-height: 3rem;
 }
 .translationBox,
 .arabicBox {
@@ -219,6 +231,21 @@ section {
   justify-content: flex-end;
   text-align: right;
   gap: 8px;
+}
+.showMoreBTN {
+  padding: 0.5rem 1rem;
+  border: 2px solid rgb(168, 168, 168);
+  font-size: 1rem;
+  width: min-content;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 300ms;
+  margin: 0 auto;
+}
+.showMoreBTN:hover {
+  border: 2px solid black;
+  transition: 300ms;
 }
 #translationPlay {
   margin-top: 4px;
