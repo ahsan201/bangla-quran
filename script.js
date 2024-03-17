@@ -76,6 +76,7 @@ const getVerses = async function (element) {
     chapterLines.insertAdjacentHTML("beforeend", `<li>${i}</li>`);
   }
 };
+
 chapter.addEventListener("click", (e) => {
   chapterLines.innerHTML = "";
   surahContent.innerHTML = "";
@@ -110,10 +111,10 @@ const chapterTitleGenarator = async function (chapterNum = 1) {
 
 const genarateSurah = async function (chapterNum = 1, page = 1) {
   const dataIndopak = await fetch(
-    `https://api.quran.com/api/v4/verses/by_chapter/${chapterNum}?translations=162&audio=1&fields=text_indopak&per_page=20`
+    `https://api.quran.com/api/v4/verses/by_chapter/${chapterNum}?translations=162&audio=1&fields=text_indopak&page=${page}&per_page=30`
   );
   const resIndopak = await dataIndopak.json();
-  console.log(resIndopak);
+  // console.log(resIndopak);
   resIndopak.verses.forEach((element) => {
     surahContent.insertAdjacentHTML(
       "beforeend",
@@ -185,6 +186,10 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
     </div>
     `
     );
+  });
+  const content = document.getElementById("content");
+  content.addEventListener("scroll", function () {
+    console.log("hiiii");
   });
 };
 chapterTitleGenarator();

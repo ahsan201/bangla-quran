@@ -59,6 +59,7 @@ nav #mainLogo img {
   border-right: 1px solid var(--Primary);
   /* overflow: hidden; */
   padding: 1rem;
+  height: 117vh;
 }
 
 #navigationType {
