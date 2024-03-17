@@ -76,11 +76,12 @@ const getVerses = async function (element) {
     chapterLines.insertAdjacentHTML("beforeend", `<li>${i}</li>`);
   }
 };
-
+let currentPageNumber = 1;
 chapter.addEventListener("click", (e) => {
   chapterLines.innerHTML = "";
   surahContent.innerHTML = "";
   surahTitle.innerHTML = "";
+  currentPageNumber = 1;
   if (e.target.tagName == "LI") {
     for (let i = 0; i < e.target.parentElement.children.length; i++) {
       e.target.parentElement.children.item(i).classList.remove("selected");
@@ -114,7 +115,7 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
     `https://api.quran.com/api/v4/verses/by_chapter/${chapterNum}?translations=162&audio=1&fields=text_indopak&page=${page}&per_page=30`
   );
   const resIndopak = await dataIndopak.json();
-  // console.log(resIndopak);
+  console.log(resIndopak);
   resIndopak.verses.forEach((element) => {
     surahContent.insertAdjacentHTML(
       "beforeend",
@@ -187,10 +188,25 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
     `
     );
   });
-  const content = document.getElementById("content");
-  content.addEventListener("scroll", function () {
-    console.log("hiiii");
-  });
+  if (resIndopak.pagination.next_page !== null) {
+    if (document.querySelector(".showMoreBTN")) {
+      const removeBtn = document.querySelector(".showMoreBTN");
+      removeBtn.remove();
+    }
+    surahContent.insertAdjacentHTML(
+      "afterend",
+      `<div class="showMoreBTN">Show More</div>`
+    );
+
+    const showMoreBTN = document.querySelector(".showMoreBTN");
+    console.log(showMoreBTN);
+    showMoreBTN.addEventListener("click", function () {
+      currentPageNumber++;
+      genarateSurah(chapterNum, currentPageNumber);
+      showMoreBTN.remove();
+    });
+  }
 };
+
 chapterTitleGenarator();
 genarateSurah();
