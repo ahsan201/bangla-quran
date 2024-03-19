@@ -107,15 +107,25 @@ const chapterTitleGenarator = async function (chapterNum = 1) {
 <span id="arabicTitle">${resChapterTitle.chapter.name_arabic}</span>`
   );
 };
+// arabic audio constructor section
+const ctx = new AudioContext();
+let isPlaying = false;
+function play(targetAudio) {
+  const playSound = ctx.createBufferSource();
+  playSound.buffer = targetAudio;
+  playSound.connect(ctx.destination);
+  playSound.start(ctx.currentTime);
+}
 
 // surah / chapter Content
-
 const genarateSurah = async function (chapterNum = 1, page = 1) {
   const dataIndopak = await fetch(
-    `https://api.quran.com/api/v4/verses/by_chapter/${chapterNum}?translations=162&audio=1&fields=text_indopak&page=${page}&per_page=30`
+    `https://api.quran.com/api/v4/verses/by_chapter/${chapterNum}?translations=162&audio=7&fields=text_indopak&page=${page}&per_page=30`
   );
   const resIndopak = await dataIndopak.json();
-  console.log(resIndopak);
+  // console.log(resIndopak.verses[0].audio.url);
+  let audio;
+
   resIndopak.verses.forEach((element) => {
     surahContent.insertAdjacentHTML(
       "beforeend",
@@ -156,7 +166,7 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
       </div>
       <div class="arabicBox">
         <div id="arabicText">${element.text_indopak}</div>
-        <div id="arabicPlay">
+        <div id="arabicPlay" data-arabicAudioLink="https://verses.quran.com/${element.audio.url}">
           <svg
             width="24"
             height="24"
@@ -206,7 +216,26 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
       showMoreBTN.remove();
     });
   }
+
+  // arabic audio
+  const arabicPlay = document.querySelectorAll("#arabicPlay");
+  arabicPlay.forEach((element) => {
+    element.addEventListener("click", function (e) {
+      console.log(e.target.closest("#arabicPlay").dataset.arabicaudiolink);
+      fetch(e.target.closest("#arabicPlay").dataset.arabicaudiolink)
+        .then((data) => data.arrayBuffer())
+        .then((arrayBuffer) => ctx.decodeAudioData(arrayBuffer))
+        .then((decodedAudio) => {
+          audio = decodedAudio;
+
+          play(audio);
+        });
+      audio = undefined;
+    });
+  });
 };
 
 chapterTitleGenarator();
 genarateSurah();
+
+// arabic audio
