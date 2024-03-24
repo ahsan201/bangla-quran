@@ -6,37 +6,36 @@ const juz = document.getElementById("juz");
 const surahSection = document.querySelector(".surahSection");
 const juzSection = document.querySelector(".juzSection");
 
-surah.addEventListener("click", function () {
-  toggoleBox.style.margin = "0% 0% 0% -47%";
-  changeView();
-});
-juz.addEventListener("click", function () {
-  toggoleBox.style.margin = "0% 0% 0% 47%";
-  changeView();
-});
+// surah.addEventListener("click", function () {
+//   toggoleBox.style.margin = "0% 0% 0% -47%";
+//   changeView();
+// });
+// juz.addEventListener("click", function () {
+//   toggoleBox.style.margin = "0% 0% 0% 47%";
+//   changeView();
+// });
 
-const changeView = function () {
-  surahSection.classList.toggle("hide");
-  juzSection.classList.toggle("hide");
-};
+// const changeView = function () {
+//   surahSection.classList.toggle("hide");
+//   juzSection.classList.toggle("hide");
+// };
 
 // Surah list / chapter list
 const chapter = document.querySelector("#chapter ul");
+const unorderedList = function (api) {
+  chapter.innerHTML = "";
+  api.chapters.forEach((element) => {
+    chapter.insertAdjacentHTML(
+      "beforeend",
+      `<li>${element.id}. ${element.name_simple}</li>`
+    );
+  });
+};
 const genarateChapter = async function () {
   const apiCall = await fetch("https://api.quran.com/api/v4/chapters");
   const res = await apiCall.json();
-  //   console.log(res.chapters);
-  const unorderedList = function () {
-    res.chapters.forEach((element) => {
-      chapter.insertAdjacentHTML(
-        "beforeend",
-        `<li>${element.id}. ${element.name_simple}</li>`
-      );
-    });
-  };
-  unorderedList();
+  unorderedList(res);
 };
-genarateChapter();
 
 // Search Chapter
 const searchChapter = document.querySelector("[data-search-chapter]");
@@ -47,7 +46,6 @@ searchChapter.addEventListener("input", (e) => {
 
   surahListSelect.forEach((surah) => {
     const isVisible = surah.textContent.toLowerCase().includes(value);
-    // console.log(isVisible);
     surah.classList.toggle("hide", !isVisible);
   });
 });
@@ -62,23 +60,22 @@ searchChapter.addEventListener("input", (e) => {
 // verses genarate
 const surahContent = document.querySelector("#surahContent"); // surah / chapter Content
 const surahTitle = document.getElementById("surahTitle");
-const chapterLines = document.querySelector("#chapterLines ul");
+// const chapterLines = document.querySelector("#chapterLines ul");
 
-const getVerses = async function (element) {
-  const verse = await fetch(
-    `https://api.quran.com/api/v4/verses/by_chapter/${parseInt(
-      element.target.textContent
-    )}`
-  );
-  const verseJson = await verse.json();
+// const getVerses = async function (element) {
+//   const verse = await fetch(
+//     `https://api.quran.com/api/v4/verses/by_chapter/${parseInt(
+//       element.target.textContent
+//     )}`
+//   );
+//   const verseJson = await verse.json();
 
-  for (let i = 1; i <= Number(verseJson.pagination.total_records); i++) {
-    chapterLines.insertAdjacentHTML("beforeend", `<li>${i}</li>`);
-  }
-};
+//   for (let i = 1; i <= Number(verseJson.pagination.total_records); i++) {
+//     chapterLines.insertAdjacentHTML("beforeend", `<li>${i}</li>`);
+//   }
+// };
 let currentPageNumber = 1;
 chapter.addEventListener("click", (e) => {
-  chapterLines.innerHTML = "";
   surahContent.innerHTML = "";
   surahTitle.innerHTML = "";
   currentPageNumber = 1;
@@ -96,11 +93,12 @@ chapter.addEventListener("click", (e) => {
 // Surah / titel Titel
 
 const chapterTitleGenarator = async function (chapterNum = 1) {
+  skeletonLoadingTitle();
   const dataChapterTitle = await fetch(
     `https://api.quran.com/api/v4/chapters/${chapterNum}    `
   );
   const resChapterTitle = await dataChapterTitle.json();
-
+  surahTitle.innerHTML = "";
   surahTitle.insertAdjacentHTML(
     "beforeend",
     `<span id="englishTitle">${resChapterTitle.chapter.name_simple}</span> /
@@ -110,21 +108,37 @@ const chapterTitleGenarator = async function (chapterNum = 1) {
 // arabic audio constructor section
 const ctx = new AudioContext();
 let isPlaying = false;
-function play(targetAudio) {
-  const playSound = ctx.createBufferSource();
+let playSound; // Define playSound outside the play function
+
+function play(targetAudio, nextAudio) {
+  // If there's an existing playSound, stop it before starting a new one
+  if (playSound) {
+    playSound.stop();
+  }
+
+  // Create a new buffer source
+  playSound = ctx.createBufferSource();
   playSound.buffer = targetAudio;
   playSound.connect(ctx.destination);
+
+  // Add event listener to detect when the audio playback ends
+  // trying to impliment autoplay function will go here
+  // playSound.onended = function () {
+  //   play(nextAudio);
+  // };
+
   playSound.start(ctx.currentTime);
 }
 
 // surah / chapter Content
 const genarateSurah = async function (chapterNum = 1, page = 1) {
+  skeletonLoadingContent();
   const dataIndopak = await fetch(
     `https://api.quran.com/api/v4/verses/by_chapter/${chapterNum}?translations=162&audio=7&fields=text_indopak&page=${page}&per_page=30`
   );
   const resIndopak = await dataIndopak.json();
-  // console.log(resIndopak.verses[0].audio.url);
   let audio;
+  surahContent.innerHTML = "";
 
   resIndopak.verses.forEach((element) => {
     surahContent.insertAdjacentHTML(
@@ -136,31 +150,7 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
         <div id="translation">
           <div id="translationText">${element.translations[0].text}</div>
           <div id="translationPlay">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <mask
-                id="mask0_5_55"
-                style="mask-type: alpha"
-                maskUnits="userSpaceOnUse"
-                x="0"
-                y="0"
-                width="24"
-                height="24"
-              >
-                <rect width="24" height="24" fill="#D9D9D9" />
-              </mask>
-              <g mask="url(#mask0_5_55)">
-                <path
-                  d="M19.95 15.95L18.4 14.4C19.1333 13.7167 19.7083 12.9083 20.125 11.975C20.5417 11.0417 20.75 10.05 20.75 9C20.75 7.95 20.5417 6.96667 20.125 6.05C19.7083 5.13334 19.1333 4.33334 18.4 3.65L19.95 2.05C20.8833 2.93334 21.625 3.975 22.175 5.175C22.725 6.375 23 7.65 23 9C23 10.35 22.725 11.625 22.175 12.825C21.625 14.025 20.8833 15.0667 19.95 15.95ZM16.75 12.75L15.15 11.15C15.45 10.8667 15.6917 10.5458 15.875 10.1875C16.0583 9.82917 16.15 9.43334 16.15 9C16.15 8.56667 16.0583 8.17084 15.875 7.8125C15.6917 7.45417 15.45 7.13334 15.15 6.85L16.75 5.25C17.2833 5.73334 17.7 6.29584 18 6.9375C18.3 7.57917 18.45 8.26667 18.45 9C18.45 9.73334 18.3 10.4208 18 11.0625C17.7 11.7042 17.2833 12.2667 16.75 12.75ZM9 13C7.9 13 6.95833 12.6083 6.175 11.825C5.39167 11.0417 5 10.1 5 9C5 7.9 5.39167 6.95834 6.175 6.175C6.95833 5.39167 7.9 5 9 5C10.1 5 11.0417 5.39167 11.825 6.175C12.6083 6.95834 13 7.9 13 9C13 10.1 12.6083 11.0417 11.825 11.825C11.0417 12.6083 10.1 13 9 13ZM1 21V18.2C1 17.65 1.14167 17.1333 1.425 16.65C1.70833 16.1667 2.1 15.8 2.6 15.55C3.45 15.1167 4.40833 14.75 5.475 14.45C6.54167 14.15 7.71667 14 9 14C10.2833 14 11.4583 14.15 12.525 14.45C13.5917 14.75 14.55 15.1167 15.4 15.55C15.9 15.8 16.2917 16.1667 16.575 16.65C16.8583 17.1333 17 17.65 17 18.2V21H1ZM3 19H15V18.2C15 18.0167 14.9542 17.85 14.8625 17.7C14.7708 17.55 14.65 17.4333 14.5 17.35C13.9 17.05 13.1292 16.75 12.1875 16.45C11.2458 16.15 10.1833 16 9 16C7.81667 16 6.75417 16.15 5.8125 16.45C4.87083 16.75 4.1 17.05 3.5 17.35C3.35 17.4333 3.22917 17.55 3.1375 17.7C3.04583 17.85 3 18.0167 3 18.2V19ZM9 11C9.55 11 10.0208 10.8042 10.4125 10.4125C10.8042 10.0208 11 9.55 11 9C11 8.45 10.8042 7.97917 10.4125 7.5875C10.0208 7.19584 9.55 7 9 7C8.45 7 7.97917 7.19584 7.5875 7.5875C7.19583 7.97917 7 8.45 7 9C7 9.55 7.19583 10.0208 7.5875 10.4125C7.97917 10.8042 8.45 11 9 11Z"
-                  fill="#262429"
-                />
-              </g>
-            </svg>
+            
           </div>
         </div>
       </div>
@@ -198,6 +188,7 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
     `
     );
   });
+
   if (resIndopak.pagination.next_page !== null) {
     if (document.querySelector(".showMoreBTN")) {
       const removeBtn = document.querySelector(".showMoreBTN");
@@ -209,7 +200,7 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
     );
 
     const showMoreBTN = document.querySelector(".showMoreBTN");
-    console.log(showMoreBTN);
+
     showMoreBTN.addEventListener("click", function () {
       currentPageNumber++;
       genarateSurah(chapterNum, currentPageNumber);
@@ -219,23 +210,202 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
 
   // arabic audio
   const arabicPlay = document.querySelectorAll("#arabicPlay");
+
   arabicPlay.forEach((element) => {
     element.addEventListener("click", function (e) {
-      console.log(e.target.closest("#arabicPlay").dataset.arabicaudiolink);
+      const nextLine = e.target
+        .closest(".surahBox")
+        .nextElementSibling.querySelector("#arabicPlay")
+        .dataset.arabicaudiolink;
+
       fetch(e.target.closest("#arabicPlay").dataset.arabicaudiolink)
         .then((data) => data.arrayBuffer())
         .then((arrayBuffer) => ctx.decodeAudioData(arrayBuffer))
         .then((decodedAudio) => {
           audio = decodedAudio;
 
-          play(audio);
+          play(audio, nextLine);
         });
       audio = undefined;
     });
   });
+  // get to a particualr part of the chatper verse
+  const surahBox = document.querySelectorAll(".surahBox");
+  const chapterLinesNumber = document.querySelector("#chapterLines ul");
+
+  // chapterLinesNumber.addEventListener("click", function (e) {
+  //   console.log(e.target.textContent);
+  //   surahBox[e.target.textContent - 1].scrollIntoView({
+  //     behavior: "smooth",
+  //   });
+  // });
+};
+// skeleton Loading
+const skeletonLoadingContent = function () {
+  // surahContent.innerHTML = "";
+  surahContent.innerHTML = `
+  <div class="surahBox">
+  <div class="translationBox">
+  <div id="lineNumber" class="skeleton skeleton-text" style="width:10%"></div>
+  <div id="translationText" class="skeleton skeleton-text"></div>
+    <div id="translation">
+      <div id="translationText" class="skeleton skeleton-text"></div>
+      <div id="translationPlay">
+        
+      </div>
+    </div>
+  </div>
+  <div class="arabicBox">
+    <div id="arabicText" class="skeleton skeleton-text" style="margin-left: 10px;margin-top:10px">
+    <div class="skeleton skeleton-text"></div>
+    <div class="skeleton skeleton-text"></div>
+    </div>
+    <div id="arabicPlay">
+      <div class="skeleton iconBox"></div>
+    </div>
+  </div>
+</div>
+<div class="surahBox">
+  <div class="translationBox">
+  <div id="lineNumber" class="skeleton skeleton-text" style="width:10%"></div>
+  <div id="translationText" class="skeleton skeleton-text"></div>
+    <div id="translation">
+      <div id="translationText" class="skeleton skeleton-text"></div>
+      <div id="translationPlay">
+        
+      </div>
+    </div>
+  </div>
+  <div class="arabicBox">
+    <div id="arabicText" class="skeleton skeleton-text" style="margin-left: 10px;margin-top:10px">
+    <div class="skeleton skeleton-text"></div>
+    <div class="skeleton skeleton-text"></div>
+    </div>
+    <div id="arabicPlay">
+      <div class="skeleton iconBox"></div>
+    </div>
+  </div>
+</div>
+<div class="surahBox">
+  <div class="translationBox">
+  <div id="lineNumber" class="skeleton skeleton-text" style="width:10%"></div>
+  <div id="translationText" class="skeleton skeleton-text"></div>
+    <div id="translation">
+      <div id="translationText" class="skeleton skeleton-text"></div>
+      <div id="translationPlay">
+        
+      </div>
+    </div>
+  </div>
+  <div class="arabicBox">
+    <div id="arabicText" class="skeleton skeleton-text" style="margin-left: 10px;margin-top:10px">
+    <div class="skeleton skeleton-text"></div>
+    <div class="skeleton skeleton-text"></div>
+    </div>
+    <div id="arabicPlay">
+      <div class="skeleton iconBox"></div>
+    </div>
+  </div>
+</div>
+<div class="surahBox">
+  <div class="translationBox">
+  <div id="lineNumber" class="skeleton skeleton-text" style="width:10%"></div>
+  <div id="translationText" class="skeleton skeleton-text"></div>
+    <div id="translation">
+      <div id="translationText" class="skeleton skeleton-text"></div>
+      <div id="translationPlay">
+        
+      </div>
+    </div>
+  </div>
+  <div class="arabicBox">
+    <div id="arabicText" class="skeleton skeleton-text" style="margin-left: 10px;margin-top:10px">
+    <div class="skeleton skeleton-text"></div>
+    <div class="skeleton skeleton-text"></div>
+    </div>
+    <div id="arabicPlay">
+      <div class="skeleton iconBox"></div>
+    </div>
+  </div>
+</div>
+<div class="surahBox">
+  <div class="translationBox">
+  <div id="lineNumber" class="skeleton skeleton-text" style="width:10%"></div>
+  <div id="translationText" class="skeleton skeleton-text"></div>
+    <div id="translation">
+      <div id="translationText" class="skeleton skeleton-text"></div>
+      <div id="translationPlay">
+        
+      </div>
+    </div>
+  </div>
+  <div class="arabicBox">
+    <div id="arabicText" class="skeleton skeleton-text" style="margin-left: 10px;margin-top:10px">
+    <div class="skeleton skeleton-text"></div>
+    <div class="skeleton skeleton-text"></div>
+    </div>
+    <div id="arabicPlay">
+      <div class="skeleton iconBox"></div>
+    </div>
+  </div>
+</div>
+<div class="surahBox">
+  <div class="translationBox">
+  <div id="lineNumber" class="skeleton skeleton-text" style="width:10%"></div>
+  <div id="translationText" class="skeleton skeleton-text"></div>
+    <div id="translation">
+      <div id="translationText" class="skeleton skeleton-text"></div>
+      <div id="translationPlay">
+        
+      </div>
+    </div>
+  </div>
+  <div class="arabicBox">
+    <div id="arabicText" class="skeleton skeleton-text" style="margin-left: 10px;margin-top:10px">
+    <div class="skeleton skeleton-text"></div>
+    <div class="skeleton skeleton-text"></div>
+    </div>
+    <div id="arabicPlay">
+      <div class="skeleton iconBox"></div>
+    </div>
+  </div>
+</div>
+`;
 };
 
+const skeletonLoadingTitle = function () {
+  // surahTitle.innerHTML = "";
+  surahTitle.innerHTML = `<div id="englishTitle" class="skeleton skeleton-surahTitle"></div> <div id="englishTitle" class="skeleton skeleton-surahTitle"></div>`;
+};
+
+//responsive chapter section
+const arrow = document.getElementById("arrow");
+const contentNavigation = document.getElementById("contentNavigation");
+arrow.addEventListener("click", function () {
+  contentNavigation.classList.toggle("sideChapterSection");
+});
+genarateChapter();
 chapterTitleGenarator();
 genarateSurah();
 
-// arabic audio
+// info overlay
+const info = document.getElementById("info");
+const overlayContainer = document.getElementById("overlayContainer");
+const overlayBox = document.getElementById("overlayBox");
+const close = document.getElementById("close");
+
+info.addEventListener("click", function () {
+  if (overlayContainer.style.display == "grid") {
+    overlayContainer.style.display = "none";
+  } else {
+    overlayContainer.style.display = "grid";
+  }
+});
+
+overlayContainer.addEventListener("click", function () {
+  overlayContainer.style.display = "none";
+});
+
+close.addEventListener("click", function () {
+  overlayContainer.style.display = "none";
+});
