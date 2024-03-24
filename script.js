@@ -87,7 +87,7 @@ chapter.addEventListener("click", (e) => {
   }
   chapterTitleGenarator(parseInt(e.target.textContent));
   genarateSurah(parseInt(e.target.textContent));
-  getVerses(e);
+  // getVerses(e);
 });
 
 // Surah / titel Titel
@@ -138,8 +138,10 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
   );
   const resIndopak = await dataIndopak.json();
   let audio;
-  surahContent.innerHTML = "";
-
+  const skeleton = document.querySelectorAll(".skeleton");
+  skeleton.forEach((element) => {
+    element.parentElement.parentElement.remove();
+  });
   resIndopak.verses.forEach((element) => {
     surahContent.insertAdjacentHTML(
       "beforeend",
@@ -242,8 +244,9 @@ const genarateSurah = async function (chapterNum = 1, page = 1) {
 };
 // skeleton Loading
 const skeletonLoadingContent = function () {
-  // surahContent.innerHTML = "";
-  surahContent.innerHTML = `
+  surahContent.insertAdjacentHTML(
+    "beforeend",
+    `
   <div class="surahBox">
   <div class="translationBox">
   <div id="lineNumber" class="skeleton skeleton-text" style="width:10%"></div>
@@ -370,11 +373,11 @@ const skeletonLoadingContent = function () {
     </div>
   </div>
 </div>
-`;
+`
+  );
 };
 
 const skeletonLoadingTitle = function () {
-  // surahTitle.innerHTML = "";
   surahTitle.innerHTML = `<div id="englishTitle" class="skeleton skeleton-surahTitle"></div> <div id="englishTitle" class="skeleton skeleton-surahTitle"></div>`;
 };
 

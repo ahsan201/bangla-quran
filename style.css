@@ -1,15 +1,15 @@
-/* @font-face {
+@font-face {
   font-family: "Indopak Fonts";
-  src: url("Fonts\IndoPak Fonts\AlQuran-IndoPak-by-QuranWBW.v.4.2.2-WL.ttf");
-} */
+  src: url("/Fonts/p1.woff2");
+}
 @font-face {
   font-family: "Bangla Alinur";
-  src: url("Fonts\AlinurTatsama\ANSI V2\Li Alinur Tatsama ANSI V2.ttf");
+  src: url("./Fonts/AlinurTatsama/Unicode/Li\ Alinur\ Tatsama\ Unicode.ttf");
 }
-/* @font-face {
+@font-face {
   font-family: "Inter";
-  src: url("Fonts\Inter\Inter-VariableFont_slnt,wght.ttf");
-} */
+  src: url("./Fonts/Inter/Inter-VariableFont_slnt\,wght.ttf");
+}
 
 :root {
   /* fonts */
@@ -178,7 +178,7 @@ section {
   overflow: scroll;
 }
 #arabicTitle {
-  font-family: var(--IndopakText);
+  font-family: "Indopak Fonts";
 }
 #surahTitle {
   display: flex;
