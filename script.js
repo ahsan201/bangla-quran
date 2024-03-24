@@ -79,6 +79,10 @@ chapter.addEventListener("click", (e) => {
   surahContent.innerHTML = "";
   surahTitle.innerHTML = "";
   currentPageNumber = 1;
+  if (document.querySelector(".showMoreBTN")) {
+    const removeBtn = document.querySelector(".showMoreBTN");
+    removeBtn.remove();
+  }
   if (e.target.tagName == "LI") {
     for (let i = 0; i < e.target.parentElement.children.length; i++) {
       e.target.parentElement.children.item(i).classList.remove("selected");

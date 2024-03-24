@@ -192,7 +192,7 @@ section {
 
 #surahContent {
   width: 100%;
-  padding: 1rem 5rem 1rem;
+  padding: 1rem 5rem 2rem;
   font-size: var(--FontSize-24);
 }
 
@@ -240,7 +240,7 @@ section {
   cursor: pointer;
   border-radius: 4px;
   transition: 300ms;
-  margin: 0 auto;
+  margin: 2.5rem auto;
 }
 .showMoreBTN:hover {
   border: 2px solid black;
